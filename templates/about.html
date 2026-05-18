@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="id" data-bs-theme="light">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Tentang — HospitalLOS</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet"/>
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet"/>
+  <link href="/static/css/style.css" rel="stylesheet"/>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg">
+  <div class="container">
+    <a class="navbar-brand" href="/"><i class="bi bi-heart-pulse-fill"></i>HospitalLOS</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navMenu">
+      <ul class="navbar-nav ms-auto align-items-center gap-1">
+        <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="/predict">Prediksi</a></li>
+        <li class="nav-item"><a class="nav-link" href="/compare">Perbandingan Model</a></li>
+        <li class="nav-item"><a class="nav-link" href="/dataset">Dataset</a></li>
+        <li class="nav-item"><a class="nav-link active" href="/about">Tentang</a></li>
+        <li class="nav-item">
+          <button id="darkToggle" class="btn btn-sm btn-outline-secondary ms-2"><i class="bi bi-moon"></i></button>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="container py-4">
+  <div class="page-header" data-aos="fade-up">
+    <h1>Tentang Proyek</h1>
+    <p>UTS Praktikum Kecerdasan Buatan — Teknik Informatika</p>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-lg-5">
+
+      <!-- IDENTITAS -->
+      <div class="card p-4 mb-3" data-aos="fade-up">
+        <div class="d-flex align-items-center gap-3 mb-3">
+          <div style="width:52px;height:52px;border-radius:50%;background:var(--primary);
+                      display:flex;align-items:center;justify-content:center;
+                      font-size:1.2rem;font-weight:700;color:#fff;flex-shrink:0">
+            MH
+          </div>
+          <div>
+            <p class="fw-600 mb-0" style="font-size:15px">Selsa Shafana Alfiyani</p>
+            <p class="text-muted mb-0" style="font-size:13px">301240041 — 4B</p>
+          </div>
+        </div>
+        <hr class="divider"/>
+        <div class="d-flex flex-column gap-2">
+          {% for label, val in [
+            ("Mata Kuliah","Praktikum Kecerdasan Buatan"),
+            ("Semester","4 (Genap)"),
+            ("Topik","Prediksi Lama Tinggal Pasien RS")
+          ] %}
+          <div class="d-flex gap-2" style="font-size:13px">
+            <span class="text-muted" style="min-width:120px">{{ label }}</span>
+            <span class="fw-500">{{ val }}</span>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- DATASET -->
+      <div class="card p-4 mb-3" data-aos="fade-up" data-aos-delay="60">
+        <p class="section-label">Dataset</p>
+        <div class="d-flex flex-column gap-2">
+          {% for label, val in [
+            ("Nama","Hospital Length of Stay"),
+            ("Sumber","Kaggle"),
+            ("Baris","100.000"),
+            ("Kolom","28")
+          ] %}
+          <div class="d-flex gap-2" style="font-size:13px">
+            <span class="text-muted" style="min-width:80px">{{ label }}</span>
+            <span class="fw-500">{{ val }}</span>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- TECH STACK -->
+      <div class="card p-4" data-aos="fade-up" data-aos-delay="120">
+        <p class="section-label">Tech Stack</p>
+        <div class="d-flex flex-wrap gap-2">
+          {% for tech in ["Python","Flask","scikit-learn","TensorFlow","NumPy","Pandas",
+                          "Matplotlib","Seaborn","Bootstrap 5","Chart.js","AOS.js","domain .my.id"] %}
+          <span class="badge-custom badge-primary">{{ tech }}</span>
+          {% endfor %}
+        </div>
+      </div>
+
+    </div>
+
+    <div class="col-lg-7">
+
+      <!-- DESKRIPSI -->
+      <div class="card p-4 mb-3" data-aos="fade-up">
+        <p class="section-label">Deskripsi Proyek</p>
+        <p style="font-size:14px;color:var(--gray-600)">
+          Proyek ini merupakan tugas individu UTS Praktikum Kecerdasan Buatan yang bertujuan
+          membangun sistem prediksi lama rawat inap pasien rumah sakit menggunakan analisis
+          komparatif 5 algoritma machine learning.
+        </p>
+        <p style="font-size:14px;color:var(--gray-600)" class="mb-0">
+          Sistem ini dapat membantu tenaga medis dan manajemen rumah sakit dalam merencanakan
+          kapasitas dan alokasi sumber daya berdasarkan estimasi lama rawat pasien sejak hari pertama masuk.
+        </p>
+      </div>
+
+  
+
+      <!-- LINK -->
+      <div class="card p-4" data-aos="fade-up" data-aos-delay="120">
+        <p class="section-label">Link Penting</p>
+        <div class="d-flex flex-column gap-2">
+          <a href="https://github.com/username/hospital-los-predict" target="_blank" class="link-item">
+            <i class="bi bi-github"></i>
+            <div>
+              <div class="fw-500">Repository GitHub</div>
+              <div class="text-muted" style="font-size:12px">github.com/username/hospital-los-predict</div>
+            </div>
+          </a>
+          <a href="https://youtube.com/watch?v=..." target="_blank" class="link-item">
+            <i class="bi bi-youtube"></i>
+            <div>
+              <div class="fw-500">Video Demo YouTube</div>
+              <div class="text-muted" style="font-size:12px">youtube.com/watch?v=...</div>
+            </div>
+          </a>
+          <a href="https://hospitallos.my.id" target="_blank" class="link-item">
+            <i class="bi bi-globe"></i>
+            <div>
+              <div class="fw-500">Aplikasi Deploy</div>
+              <div class="text-muted" style="font-size:12px">hospitallos.my.id</div>
+            </div>
+
+          </a>
+          <a href="https://kaggle.com/datasets/aayushchou/hospital-length-of-stay-dataset-microsoft"
+             target="_blank" class="link-item">
+            <i class="bi bi-database"></i>
+            <div>
+              <div class="fw-500">Dataset Kaggle</div>
+              <div class="text-muted" style="font-size:12px">Hospital Length of Stay — Microsoft</div>
+            </div>
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="container text-center">
+    <p class="mb-1 fw-500">HospitalLOS — Prediksi Lama Tinggal Pasien RS</p>
+    <p class="text-muted mb-0">UTS Praktikum Kecerdasan Buatan &nbsp;·&nbsp; Teknik Informatika &nbsp;·&nbsp; 2026</p>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script src="/static/js/main.js"></script>
+</body>
+</html>

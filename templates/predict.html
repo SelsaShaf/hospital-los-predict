@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="id" data-bs-theme="light">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Prediksi — HospitalLOS</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet"/>
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet"/>
+  <link href="/static/css/style.css" rel="stylesheet"/>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg">
+  <div class="container">
+    <a class="navbar-brand" href="/"><i class="bi bi-heart-pulse-fill"></i>HospitalLOS</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navMenu">
+      <ul class="navbar-nav ms-auto align-items-center gap-1">
+        <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+        <li class="nav-item"><a class="nav-link active" href="/predict">Prediksi</a></li>
+        <li class="nav-item"><a class="nav-link" href="/compare">Perbandingan Model</a></li>
+        <li class="nav-item"><a class="nav-link" href="/dataset">Dataset</a></li>
+        <li class="nav-item"><a class="nav-link" href="/about">Tentang</a></li>
+        <li class="nav-item">
+          <button id="darkToggle" class="btn btn-sm btn-outline-secondary ms-2">
+            <i class="bi bi-moon"></i>
+          </button>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-box">
+    <div class="spinner-border text-primary" role="status"></div>
+    <p>Sedang memproses prediksi...</p>
+  </div>
+</div>
+
+<div class="container py-4">
+  <div class="page-header" data-aos="fade-up">
+    <h1>Prediksi Lama Rawat Inap</h1>
+    <p>Masukkan data klinis pasien untuk mendapatkan estimasi lama rawat inap</p>
+  </div>
+
+  <!-- TABS -->
+  <div class="mb-4" data-aos="fade-up">
+    <ul class="nav nav-tabs" id="inputTabs">
+      <li class="nav-item">
+        <button class="nav-link active" id="tab-awam-btn" data-bs-toggle="tab" data-bs-target="#tab-awam">
+          <i class="bi bi-person me-1"></i>Mode Pasien
+        </button>
+      </li>
+      <li class="nav-item">
+        <button class="nav-link" id="tab-manual-btn" data-bs-toggle="tab" data-bs-target="#tab-manual">
+          <i class="bi bi-pencil-square me-1"></i>Mode Tenaga Medis
+        </button>
+      </li>
+      <li class="nav-item">
+        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-upload">
+          <i class="bi bi-upload me-1"></i>Upload CSV
+        </button>
+      </li>
+      <li class="nav-item">
+        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-sample">
+          <i class="bi bi-database me-1"></i>Data Contoh
+        </button>
+      </li>
+    </ul>
+  </div>
+
+  <div class="tab-content">
+
+    <!-- TAB MODE PASIEN -->
+    <div class="tab-pane fade show active" id="tab-awam">
+      <div class="alert d-flex align-items-start gap-2 mb-3"
+           style="background:var(--primary-light);border:1px solid #BFDBFE;border-radius:var(--radius);padding:1rem 1.25rem">
+        <i class="bi bi-info-circle-fill text-primary mt-1" style="flex-shrink:0"></i>
+        <div style="font-size:13px;color:var(--gray-600)">
+          Siapkan informasi kondisi umum pasien. Mode ini tidak memerlukan kertas hasil laboratorium.
+          Untuk prediksi lebih akurat gunakan <strong>Mode Tenaga Medis</strong>.
+        </div>
+      </div>
+
+      <form id="awamForm" novalidate>
+
+        <div class="card p-4 mb-3" data-aos="fade-up">
+          <p class="section-label">A — Informasi Umum Pasien</p>
+          <div class="row g-3">
+            <div class="col-md-4">
+              <label class="form-label">Jenis Kelamin</label>
+              <select class="form-select" id="aw_gender">
+                <option value="F">Perempuan</option>
+                <option value="M">Laki-laki</option>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Riwayat Kunjungan ke RS Ini</label>
+              <select class="form-select" id="aw_rcount">
+                <option value="0">Ini kunjungan pertama</option>
+                <option value="1">Sudah pernah 1 kali</option>
+                <option value="2">Sudah pernah 2 kali</option>
+                <option value="3">Sudah pernah 3 kali</option>
+                <option value="4">Sudah pernah 4 kali</option>
+                <option value="5+">5 kali atau lebih</option>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Fasilitas Rumah Sakit</label>
+              <select class="form-select" id="aw_facid">
+                <option value="A">Fasilitas A</option>
+                <option value="B">Fasilitas B</option>
+                <option value="C">Fasilitas C</option>
+                <option value="D">Fasilitas D</option>
+                <option value="E">Fasilitas E</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="card p-4 mb-3" data-aos="fade-up" data-aos-delay="60">
+          <p class="section-label">B — Data Fisik Pasien</p>
+          <div class="row g-3">
+            <div class="col-md-3">
+              <label class="form-label">Berat Badan <span class="unit">kg</span></label>
+              <input type="number" step="0.1" class="form-control" id="aw_weight" placeholder="Contoh: 65"/>
+              <div class="form-text">Berat badan pasien dalam kilogram</div>
+              <div class="invalid-feedback" id="aw_weight_err"></div>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Tinggi Badan <span class="unit">cm</span></label>
+              <input type="number" step="0.1" class="form-control" id="aw_height" placeholder="Contoh: 165"/>
+              <div class="form-text">Tinggi badan pasien dalam sentimeter</div>
+              <div class="invalid-feedback" id="aw_height_err"></div>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Detak Jantung <span class="unit">bpm</span></label>
+              <input type="number" class="form-control" id="aw_pulse" placeholder="Contoh: 80"/>
+              <div class="form-text">Lihat di monitor RS atau smartwatch. Normal: 60–100</div>
+              <div class="invalid-feedback" id="aw_pulse_err"></div>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">BMI (Otomatis)</label>
+              <input type="text" class="form-control" id="aw_bmi_display" placeholder="Terisi otomatis" readonly
+                     style="background:var(--gray-100);cursor:not-allowed"/>
+              <div class="form-text">Dihitung otomatis dari berat dan tinggi</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card p-4 mb-3" data-aos="fade-up" data-aos-delay="80">
+          <p class="section-label">C — Kondisi Kesehatan Umum</p>
+          <p class="text-muted mb-3" style="font-size:13px">
+            Jawab pertanyaan berikut berdasarkan kondisi pasien saat ini atau hasil penjelasan dokter
+          </p>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Bagaimana kadar gula darah pasien?</label>
+              <select class="form-select" id="aw_glucose">
+                <option value="90">Normal (hasil lab normal atau belum cek)</option>
+                <option value="130">Sedikit tinggi (dokter menyebut gula agak tinggi)</option>
+                <option value="200">Tinggi (dokter menyebut gula darah tinggi)</option>
+                <option value="300">Sangat tinggi (dokter menyebut gula sangat tinggi / diabetes berat)</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Apakah ada masalah fungsi ginjal?</label>
+              <select class="form-select" id="aw_kidney">
+                <option value="normal">Tidak ada / belum diketahui</option>
+                <option value="mild">Ringan (dokter menyebut fungsi ginjal sedikit menurun)</option>
+                <option value="moderate">Sedang (dokter menyebut ada gangguan ginjal)</option>
+                <option value="severe">Berat (dokter menyebut gagal ginjal)</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Bagaimana kondisi pernapasan pasien?</label>
+              <select class="form-select" id="aw_respiration">
+                <option value="16">Normal (tidak ada keluhan napas)</option>
+                <option value="20">Sedikit sesak (napas terasa lebih cepat)</option>
+                <option value="26">Sesak napas (butuh bantuan oksigen atau napas berat)</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Apakah ada tanda anemia atau darah rendah?</label>
+              <select class="form-select" id="aw_anemia">
+                <option value="42">Tidak (kulit normal, tidak pucat)</option>
+                <option value="30">Ya (kulit pucat, lemas, dokter menyebut anemia)</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Apakah ada tanda infeksi atau demam tinggi?</label>
+              <select class="form-select" id="aw_infection">
+                <option value="62">Tidak ada tanda infeksi</option>
+                <option value="82">Ya (demam tinggi, dokter menyebut ada infeksi)</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Bagaimana kondisi cairan / hidrasi pasien?</label>
+              <select class="form-select" id="aw_hydration">
+                <option value="139">Normal (minum cukup, tidak dehidrasi)</option>
+                <option value="133">Dehidrasi (lemas, jarang minum, bibir kering)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="card p-4 mb-3" data-aos="fade-up" data-aos-delay="100">
+          <p class="section-label">D — Penyakit Penyerta</p>
+          <p class="text-muted mb-3" style="font-size:13px">
+            Centang jika dokter pernah mendiagnosis kondisi berikut pada pasien
+          </p>
+          <div class="row g-2">
+            {% set awam_conditions = [
+              ("aw_dialysis",   "Penyakit Ginjal Kronis"),
+              ("aw_asthma",     "Asma"),
+              ("aw_irondef",    "Kekurangan Zat Besi / Anemia"),
+              ("aw_pneum",      "Pneumonia / Infeksi Paru"),
+              ("aw_substance",  "Riwayat Ketergantungan Alkohol atau Obat"),
+              ("aw_psych",      "Gangguan Kejiwaan (Bipolar, Skizofrenia, dll)"),
+              ("aw_depress",    "Depresi"),
+              ("aw_psychother", "Sedang Menjalani Terapi Psikologis"),
+              ("aw_fibrosis",   "Penyakit Paru Kronis"),
+              ("aw_malnut",     "Malnutrisi / Kekurangan Gizi"),
+              ("aw_hemo",       "Kelainan Sel Darah Merah"),
+              ("aw_secondary",  "Ada Penyakit Lain yang Tidak Termasuk di Atas")
+            ] %}
+            {% for field, label in awam_conditions %}
+            <div class="col-6 col-md-4 col-lg-3">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="{{ field }}"/>
+                <label class="form-check-label" for="{{ field }}">{{ label }}</label>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="d-flex gap-2 mb-4" data-aos="fade-up">
+          <button type="button" class="btn btn-primary px-4" id="awamPredictBtn">
+            <i class="bi bi-lightning-charge-fill me-1"></i>Prediksi Sekarang
+          </button>
+          <button type="button" class="btn btn-outline-secondary px-4" id="awamResetBtn">
+            <i class="bi bi-arrow-counterclockwise me-1"></i>Reset Form
+          </button>
+        </div>
+
+      </form>
+    </div>
+
+    <!-- TAB MANUAL (MODE TENAGA MEDIS) -->
+    <div class="tab-pane fade" id="tab-manual">
+      <form id="predictForm" novalidate>
+        <div class="card p-4 mb-3" data-aos="fade-up">
+          <p class="section-label">A — Informasi Umum Pasien</p>
+          <div class="row g-3">
+            <div class="col-md-4">
+              <label class="form-label">Jenis Kelamin</label>
+              <select class="form-select" id="gender">
+                <option value="F">Perempuan</option>
+                <option value="M">Laki-laki</option>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Riwayat Kunjungan ke RS Ini</label>
+              <select class="form-select" id="rcount">
+                <option value="0">Ini kunjungan pertama</option>
+                <option value="1">Sudah pernah 1 kali</option>
+                <option value="2">Sudah pernah 2 kali</option>
+                <option value="3">Sudah pernah 3 kali</option>
+                <option value="4">Sudah pernah 4 kali</option>
+                <option value="5+">5 kali atau lebih</option>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Fasilitas Rumah Sakit</label>
+              <select class="form-select" id="facid">
+                <option value="A">Fasilitas A</option>
+                <option value="B">Fasilitas B</option>
+                <option value="C">Fasilitas C</option>
+                <option value="D">Fasilitas D</option>
+                <option value="E">Fasilitas E</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="card p-4 mb-3" data-aos="fade-up" data-aos-delay="60">
+          <p class="section-label">B — Hasil Pemeriksaan Laboratorium</p>
+          <div class="row g-3">
+            <div class="col-md-3">
+              <label class="form-label">BMI <span class="unit">kg/m²</span></label>
+              <input type="number" step="0.1" class="form-control" id="bmi" placeholder="cth: 25.3"/>
+              <div class="form-text">Normal: 18.5 – 24.9</div>
+              <div class="invalid-feedback" id="bmi_err"></div>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Glukosa <span class="unit">mg/dL</span></label>
+              <input type="number" step="0.1" class="form-control" id="glucose" placeholder="cth: 90"/>
+              <div class="form-text">Normal puasa: 70 – 100</div>
+              <div class="invalid-feedback" id="glucose_err"></div>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Detak Jantung <span class="unit">bpm</span></label>
+              <input type="number" class="form-control" id="pulse" placeholder="cth: 72"/>
+              <div class="form-text">Normal: 60 – 100</div>
+              <div class="invalid-feedback" id="pulse_err"></div>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Sodium <span class="unit">mEq/L</span></label>
+              <input type="number" step="0.1" class="form-control" id="sodium" placeholder="cth: 138"/>
+              <div class="form-text">Normal: 135 – 145</div>
+              <div class="invalid-feedback" id="sodium_err"></div>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Kreatinin <span class="unit">mg/dL</span></label>
+              <input type="number" step="0.01" class="form-control" id="creatinine" placeholder="cth: 1.0"/>
+              <div class="form-text">Normal: 0.6 – 1.3</div>
+              <div class="invalid-feedback" id="creatinine_err"></div>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Hematokrit <span class="unit">%</span></label>
+              <input type="number" step="0.1" class="form-control" id="hematocrit" placeholder="cth: 40"/>
+              <div class="form-text">Normal: 35 – 50%</div>
+              <div class="invalid-feedback" id="hematocrit_err"></div>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Neutrofil <span class="unit">%</span></label>
+              <input type="number" step="0.1" class="form-control" id="neutrophils" placeholder="cth: 60"/>
+              <div class="form-text">Normal: 50 – 70%</div>
+              <div class="invalid-feedback" id="neutrophils_err"></div>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Blood Urea Nitrogen <span class="unit">mg/dL</span></label>
+              <input type="number" step="0.1" class="form-control" id="bloodureanitro" placeholder="cth: 14"/>
+              <div class="form-text">Normal: 7 – 20</div>
+              <div class="invalid-feedback" id="bloodureanitro_err"></div>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Laju Pernapasan <span class="unit">/menit</span></label>
+              <input type="number" step="0.1" class="form-control" id="respiration" placeholder="cth: 16"/>
+              <div class="form-text">Normal: 12 – 20</div>
+              <div class="invalid-feedback" id="respiration_err"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card p-4 mb-3" data-aos="fade-up" data-aos-delay="120">
+          <p class="section-label">C — Penyakit Penyerta</p>
+          <p class="text-muted mb-3" style="font-size:13px">Centang jika pasien memiliki kondisi berikut berdasarkan diagnosis dokter</p>
+          <div class="row g-2">
+            {% set conditions = [
+              ("dialysisrenalendstage", "Gagal Ginjal Kronis"),
+              ("asthma", "Asma"),
+              ("irondef", "Defisiensi Zat Besi"),
+              ("pneum", "Pneumonia"),
+              ("substancedependence", "Ketergantungan Zat"),
+              ("psychologicaldisordermajor", "Gangguan Psikologis Mayor"),
+              ("depress", "Depresi"),
+              ("psychother", "Terapi Psikologis"),
+              ("fibrosisandother", "Fibrosis Paru"),
+              ("malnutrition", "Malnutrisi"),
+              ("hemo", "Anemia Hemolitik"),
+              ("secondarydiagnosisnonicd9", "Diagnosis Sekunder Lainnya")
+            ] %}
+            {% for field, label in conditions %}
+            <div class="col-6 col-md-4 col-lg-3">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="{{ field }}"/>
+                <label class="form-check-label" for="{{ field }}">{{ label }}</label>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="d-flex gap-2 mb-4" data-aos="fade-up">
+          <button type="button" class="btn btn-primary px-4" id="predictBtn">
+            <i class="bi bi-lightning-charge-fill me-1"></i>Prediksi Sekarang
+          </button>
+          <button type="button" class="btn btn-outline-secondary px-4" id="resetBtn">
+            <i class="bi bi-arrow-counterclockwise me-1"></i>Reset Form
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- TAB UPLOAD -->
+    <div class="tab-pane fade" id="tab-upload">
+      <div class="card p-4 mb-3" data-aos="fade-up">
+        <p class="section-label">Upload File CSV</p>
+        <div class="upload-zone" id="uploadZone">
+          <i class="bi bi-file-earmark-arrow-up"></i>
+          <p id="uploadLabel" class="fw-500 mb-1">Seret file CSV ke sini atau klik untuk memilih</p>
+          <p class="text-muted mb-2" style="font-size:12px">Format .csv &nbsp;·&nbsp; Maksimal 10MB &nbsp;·&nbsp; Kolom harus sesuai template</p>
+          <input type="file" id="csvFile" accept=".csv" class="d-none"/>
+        </div>
+        <div class="d-flex align-items-center gap-2 mt-2">
+          <i class="bi bi-info-circle text-primary"></i>
+          <span class="text-muted" style="font-size:12px">Belum punya template?</span>
+          <a href="/static/template_prediksi.csv" class="text-primary" style="font-size:12px">Download template CSV</a>
+        </div>
+        <div id="csvPreview"></div>
+        <button class="btn btn-primary mt-3" id="csvSubmitBtn" style="display:none">
+          <i class="bi bi-play-fill me-1"></i>Prediksi Semua Data & Download Hasil
+        </button>
+      </div>
+    </div>
+
+    <!-- TAB SAMPLE -->
+    <div class="tab-pane fade" id="tab-sample">
+      <div class="card p-4 mb-3" data-aos="fade-up">
+        <p class="section-label">Data Contoh dari Dataset</p>
+        <p class="text-muted mb-4" style="font-size:13px">
+          Sistem akan mengambil satu data pasien secara acak dari dataset asli (100.000 pasien)
+          sebagai contoh demonstrasi. Form input manual akan terisi otomatis.
+        </p>
+        <button class="btn btn-primary" id="sampleBtn">
+          <i class="bi bi-shuffle me-1"></i>Ambil Data Acak & Isi Form
+        </button>
+        <p id="sampleNote" class="text-muted mt-2 mb-0" style="font-size:12px"></p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- HASIL PREDIKSI -->
+  <div id="resultSection" style="display:none">
+    <hr class="divider"/>
+    <h5 class="section-title" data-aos="fade-up">Hasil Prediksi</h5>
+
+    <div id="awamDisclaimer" style="display:none;background:#FEF9C3;border:1px solid #FDE68A;border-radius:var(--radius);padding:1rem 1.25rem;margin-bottom:1rem">
+      <div class="d-flex gap-2 align-items-start">
+        <i class="bi bi-exclamation-triangle-fill mt-1" style="color:#D97706;flex-shrink:0"></i>
+        <p style="font-size:13px;color:#92400E;margin:0">
+          Prediksi ini menggunakan estimasi nilai laboratorium berdasarkan jawaban kondisi umum pasien.
+          Untuk hasil yang lebih akurat, gunakan Mode Tenaga Medis dengan data lab lengkap dari rumah sakit.
+        </p>
+      </div>
+    </div>
+
+    <div class="row g-3">
+      <div class="col-lg-5" data-aos="fade-up">
+        <div class="result-hero">
+          <p class="text-muted mb-1" style="font-size:13px">Estimasi lama rawat inap</p>
+          <div class="result-days" id="resDays">—</div>
+          <div class="result-unit">hari</div>
+          <div class="mt-3">
+            <span class="badge-custom" id="resCatBadge">—</span>
+          </div>
+          <p class="mt-2 mb-0" id="resCatDesc" style="font-size:13px;color:var(--gray-600)"></p>
+        </div>
+      </div>
+
+      <div class="col-lg-7" data-aos="fade-up" data-aos-delay="60">
+        <div class="card p-4 h-100">
+          <p class="section-title">Rentang Kepercayaan Prediksi</p>
+          <p style="font-size:13px;color:var(--gray-600)">
+            Estimasi: <strong><span id="resConfLow">—</span> – <span id="resConfHigh">—</span> hari</strong>
+          </p>
+          <div class="confidence-track mb-2">
+            <div class="conf-fill" style="width:100%"></div>
+            <div class="confidence-range" id="confRange" style="left:0;width:0"></div>
+          </div>
+          <div class="d-flex justify-content-between text-muted" style="font-size:11px">
+            <span>1 hari</span><span>17 hari</span>
+          </div>
+          <hr class="divider"/>
+          <p class="section-title">Saran Klinis</p>
+          <ul id="suggestionBox" style="font-size:13px;color:var(--gray-600);padding-left:1.25rem"></ul>
+          <p class="text-muted mb-0" style="font-size:11px">
+            <i class="bi bi-info-circle me-1"></i>
+            Hasil ini bersifat estimasi dan tidak menggantikan keputusan tenaga medis profesional.
+          </p>
+        </div>
+      </div>
+
+      <div class="col-12" data-aos="fade-up">
+        <div class="card p-4">
+          <p class="section-title">Perbandingan Hasil Semua Model</p>
+          <div class="table-responsive">
+            <table class="table mb-0">
+              <thead>
+                <tr>
+                  <th>Model</th>
+                  <th>Prediksi</th>
+                  <th>Hasil</th>
+                </tr>
+              </thead>
+              <tbody id="allModelsTbody"></tbody>
+            </table>
+          </div>
+          <p class="text-muted mt-2 mb-0" style="font-size:12px">
+            Rekomendasi utama menggunakan model dengan RMSE terbaik pada data uji.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="container text-center">
+    <p class="mb-1 fw-500">HospitalLOS — Prediksi Lama Tinggal Pasien RS</p>
+    <p class="text-muted mb-0">UTS Praktikum Kecerdasan Buatan &nbsp;·&nbsp; Teknik Informatika &nbsp;·&nbsp; 2026</p>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script src="/static/js/main.js"></script>
+</body>
+</html>

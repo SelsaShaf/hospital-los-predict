@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="id" data-bs-theme="light">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Dataset — HospitalLOS</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet"/>
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet"/>
+  <link href="/static/css/style.css" rel="stylesheet"/>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg">
+  <div class="container">
+    <a class="navbar-brand" href="/"><i class="bi bi-heart-pulse-fill"></i>HospitalLOS</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navMenu">
+      <ul class="navbar-nav ms-auto align-items-center gap-1">
+        <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="/predict">Prediksi</a></li>
+        <li class="nav-item"><a class="nav-link" href="/compare">Perbandingan Model</a></li>
+        <li class="nav-item"><a class="nav-link active" href="/dataset">Dataset</a></li>
+        <li class="nav-item"><a class="nav-link" href="/about">Tentang</a></li>
+        <li class="nav-item">
+          <button id="darkToggle" class="btn btn-sm btn-outline-secondary ms-2"><i class="bi bi-moon"></i></button>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="container py-4">
+  <div class="page-header" data-aos="fade-up">
+    <h1>Informasi Dataset</h1>
+    <p>Hospital Length of Stay Dataset — Microsoft, tersedia di Kaggle</p>
+  </div>
+
+  <!-- METRIC CARDS -->
+  <div class="row g-3 mb-4">
+    {% for label, val in [("Sumber","Microsoft / Kaggle"),("Lisensi","CC BY 4.0"),("Total Baris","100.000"),("Total Kolom","28")] %}
+    <div class="col-6 col-md-3" data-aos="fade-up" data-aos-delay="{{ loop.index0 * 60 }}">
+      <div class="card metric-card h-100">
+        <div class="metric-val" style="font-size:1.1rem">{{ val }}</div>
+        <div class="metric-label">{{ label }}</div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- GRAFIK EDA STATIS -->
+  <div class="mb-4" data-aos="fade-up">
+    <p class="section-title">Exploratory Data Analysis (EDA)</p>
+    <div class="row g-3">
+      {% for img, caption in [
+        ("eda_distribusi_los.png","Distribusi lama rawat inap pasien"),
+        ("eda_korelasi_heatmap.png","Heatmap korelasi fitur numerik"),
+        ("eda_distribusi_gender.png","Distribusi gender pasien"),
+        ("eda_boxplot_los.png","Boxplot lama rawat inap")
+      ] %}
+      <div class="col-md-6">
+        <div class="card p-3">
+          <img src="/static/img/{{ img }}" class="img-fluid rounded"
+               alt="{{ caption }}" onerror="this.style.display='none'"/>
+          <p class="text-muted text-center mt-2 mb-0" style="font-size:12px">{{ caption }}</p>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- STATISTIK DESKRIPTIF -->
+  <div class="card p-4 mb-4" data-aos="fade-up">
+    <p class="section-title">Statistik Deskriptif Fitur Utama</p>
+    <div class="table-responsive">
+      <table class="table mb-0">
+        <thead>
+          <tr>
+            <th>Fitur</th>
+            <th class="text-center">Min</th>
+            <th class="text-center">Rata-rata</th>
+            <th class="text-center">Maks</th>
+            <th class="text-center">Std</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for col, s in stats.items() %}
+          <tr {% if col == "lengthofstay" %}class="best-row"{% endif %}>
+            <td class="fw-500">
+              {{ col }}
+              {% if col == "lengthofstay" %}
+                <span class="badge-custom badge-primary ms-2">Target</span>
+              {% endif %}
+            </td>
+            <td class="text-center">{{ s.min }}</td>
+            <td class="text-center">{{ s.mean }}</td>
+            <td class="text-center">{{ s.max }}</td>
+            <td class="text-center text-muted">{{ s.std }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- PENJELASAN FITUR -->
+  <div class="card p-4 mb-4" data-aos="fade-up">
+    <p class="section-title">Penjelasan Fitur Dataset</p>
+    <div class="table-responsive">
+      <table class="table mb-0">
+        <thead>
+          <tr><th>Nama Fitur</th><th>Penjelasan</th><th>Nilai Normal</th><th>Tipe</th></tr>
+        </thead>
+        <tbody>
+          {% for row in [
+            ("rcount","Jumlah kunjungan rawat inap sebelumnya","0 – 5+","Kategorikal"),
+            ("gender","Jenis kelamin pasien","F / M","Kategorikal"),
+            ("facid","Kode fasilitas / bangsal RS","A – E","Kategorikal"),
+            ("hematocrit","Persentase sel darah merah dalam darah","35 – 50%","Numerik"),
+            ("neutrophils","Persentase sel darah putih neutrofil","50 – 70%","Numerik"),
+            ("sodium","Kadar natrium dalam darah","135 – 145 mEq/L","Numerik"),
+            ("glucose","Kadar gula darah","70 – 100 mg/dL","Numerik"),
+            ("bloodureanitro","Indikator fungsi ginjal dari urea","7 – 20 mg/dL","Numerik"),
+            ("creatinine","Indikator fungsi ginjal dari kreatinin","0.6 – 1.3 mg/dL","Numerik"),
+            ("bmi","Indeks massa tubuh","18.5 – 24.9 kg/m²","Numerik"),
+            ("pulse","Detak jantung per menit","60 – 100 bpm","Numerik"),
+            ("respiration","Laju pernapasan per menit","12 – 20/menit","Numerik"),
+            ("lengthofstay","Target — lama rawat inap pasien","1 – 17 hari","Target")
+          ] %}
+          <tr {% if row[0] == "lengthofstay" %}class="best-row"{% endif %}>
+            <td class="fw-500">{{ row[0] }}</td>
+            <td style="font-size:13px">{{ row[1] }}</td>
+            <td style="font-size:13px;color:var(--gray-600)">{{ row[2] }}</td>
+            <td>
+              {% if row[3] == "Target" %}
+                <span class="badge-custom badge-primary">{{ row[3] }}</span>
+              {% elif row[3] == "Kategorikal" %}
+                <span class="badge-custom badge-warning">{{ row[3] }}</span>
+              {% else %}
+                <span class="badge-custom badge-gray">{{ row[3] }}</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- PREVIEW DATA -->
+  <div class="card p-4" data-aos="fade-up">
+    <p class="section-title">Preview 10 Baris Pertama Dataset</p>
+    <div class="table-responsive">
+      <table class="table table-sm mb-0" style="font-size:12px;white-space:nowrap">
+        <thead>
+          <tr>
+            {% if preview %}
+              {% for key in preview[0].keys() %}
+              <th>{{ key }}</th>
+              {% endfor %}
+            {% endif %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in preview %}
+          <tr>
+            {% for val in row.values() %}
+            <td>{{ val }}</td>
+            {% endfor %}
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="container text-center">
+    <p class="mb-1 fw-500">HospitalLOS — Prediksi Lama Tinggal Pasien RS</p>
+    <p class="text-muted mb-0">UTS Praktikum Kecerdasan Buatan &nbsp;·&nbsp; Teknik Informatika &nbsp;·&nbsp; 2026</p>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script src="/static/js/main.js"></script>
+</body>
+</html>
